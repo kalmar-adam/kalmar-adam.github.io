@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<script>
+	var calHandle = {
+		months: ["Január","Február","Március",
+				"Április","Május","Június",
+				"Július","Augusztus","Szeptember",
+				"Október","November","December",],
+		weekdays:"H\tK\tSze\tCs\tP\tSzo\tV\t\n",
+		daysOfMonths: [31,28,31,30,31,30,31,31,30,31,30,31],
+		setFebDays: function(y){ if (y%4==0) this.daysOfMonths[1]=29; else this.daysOfMonths[1]=28; },
+		
+		actMonth:0, //0-11
+		actWeekDay:4, //0-6
+		actYear:2021,
+		actDay:1, //1-...
+		setAllActs:function(ay, am, ad, awd){
+			this.actMonth=am;
+			this.actWeekDay=awd;
+			this.actYear=ay;
+			this.actDay=ad;
+			this.setFebDays();
+		},
+		addYear:function(int){
+			this.actYear+=int;
+			this.setFebDays(this.actYear);
+		},
+		addMonth:function(int){
+			this.actMonth+=int;
+			while(this.actMonth>11){this.actMonth-=12;this.addYear(1);}
+			while(this.actMonth<0){this.actMonth+=12;this.addYear(-1);}
+		},
+		addDay:function(int){
+			this.actDay+=int;
+			if(this.daysOfMonths[this.actMonth]<this.actDay){
+				this.actDay=1;
+				this.addMonth(1);
+			}
+			if(1>this.actDay){
+				this.addMonth(-1);
+				this.actDay=this.daysOfMonths[this.actMonth];
+			}
+			this.actWeekDay+=int;
+			while(this.actWeekDay>6){
+				this.actWeekDay-=7;
+			}
+			while(this.actWeekDay<0){
+				this.actWeekDay+=7;
+			}
+		}
+	}
+
+	function gen(y){
+		calHandle.setAllActs(2021,0,1,4);
+		while(y<calHandle.actYear || calHandle.actMonth!=0 || calHandle.actDay!=1 ){
+			calHandle.addDay(-1);
+		}
+		while(y>calHandle.actYear || calHandle.actMonth!=0 || calHandle.actDay!=1){
+			calHandle.addDay(+1);
+		}
+		//alert(calHandle.actWeekDay);
+		var out=[]; //0-11
+		var actM="";
+		while(calHandle.actMonth<=11 || calHandle.actDay<=31){
+			if(calHandle.actDay==1){
+				actM+=calHandle.months[calHandle.actMonth]+"\t\t\t\t\t\t\t\n";
+				actM+=calHandle.weekdays;
+				for(var i=0;i<calHandle.actWeekDay;i++){
+					actM+="\t";
+				}
+			}
+			actM+=calHandle.actDay+"\t";
+			if(calHandle.actWeekDay==6){actM+="\n";}
+			if(calHandle.actDay==calHandle.daysOfMonths[calHandle.actMonth]){
+				for(var i=calHandle.actWeekDay;i<6;i++){
+					actM+="\t";
+				}if (calHandle.actWeekDay!=6) {actM+="\n";}
+				out.push(actM); actM="";
+			}
+			if(calHandle.actMonth==11 && calHandle.actDay==31) break;
+			calHandle.addDay(1);
+		}
+		document.getElementById('out').value="";
+		/*for(var i=0;i<12;i++){
+			document.getElementById('out').value+=out[i];
+		}*/
+		for(var i = 0;i<11;i+=3){
+			for(var k=0;k<8;k++){
+				var r="";
+				for(var j=0;j<(3).toFixed();j++){
+					if(out[i+j].split('\n').length>k && out[i+j].split('\n')[k]!=""){
+						r+=out[i+j].split('\n')[k];
+					} else r+="\t\t\t\t\t\t\t";
+				}
+				document.getElementById('out').value+=r+"\n";
+			}
+		} 
+	}
+
+
+	</script>
+	Year (input):
+	<input id="n" type="number"><br>
+	Calendar (output) (Copy and Paste -> Excel/LibreCalc):<br>
+	<textarea rows="10" cols="70" id="out"></textarea><br>
+	<button onclick="gen(n.value)">Generál</button>
+</body>
+</html>
