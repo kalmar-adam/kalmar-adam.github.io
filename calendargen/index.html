@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            * {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            table{
+                border: 2px solid black;
+                display: block;
+                margin: 5px;
+            }
+            th, td{
+                border: 1px solid black;
+                width: 30px;
+            }
+            #wrapper{
+                text-align: center;
+                margin: 0 auto;
+            }
+            h1{
+                padding: 0;
+                margin: 0;
+            }
+            h1:hover{
+                text-decoration-line: underline;
+            }
+            .dayLabel{
+                border: none;
+                font-weight: 600;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="control" style="width: auto; border: 3px solid black; padding: 5px;">
+            <p>Control</p>
+            Year: <input id="year" type="number"><br>
+            Language.: <br>
+            HU:<input type="radio" name="lang" id="lang1" value="0" checked><br>
+            EN:<input type="radio" name="lang" id="lang2" value="1"><br>
+            Monday is the first day of the week: <input type="checkbox" name="md" id="mday" checked> <br>
+            Width of the calendar: <input type="number" id="woc" min="300" oninput="changeWidth()" onchange="changeWidth()" value="810"> <br>
+            <button onclick="gen()">GENERAL</button><br>
+            <p>After generation click on the year to toggle display/hide this control panel and you can simply print the calendar!</p>
+        </div>
+        <div id="wrapper">
+            <h1 id="y" onclick="displayToggle()"></h1>
+            <div id="calendar" style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+            </div>
+        </div>
+        
+
+        <script>
+            var dToggle=true;
+
+            function changeWidth(){
+                document.getElementById('wrapper').style.width = document.getElementById('woc').value +"px";
+            }
+            function gen(){
+                changeWidth();
+                let langIdx;
+                for (let i = 0; i < document.getElementsByName('lang').length; i++) {
+                    if(document.getElementsByName('lang')[i].checked){
+                        langIdx=i;
+                        break;
+                    }
+                }
+                let date=new Date();
+                date.setFullYear(document.getElementById('year').value,0,1);
+                if(date.getFullYear()<1) {
+                    alert("Year must be greater than 0!");
+                    return;
+                }
+                let dayNames=[
+                    ["H","K","Sze","Cs","P","Szo","V"],
+                    ["M","Tu","W","Th","F","Sa","Su"]
+                ];
+                let monthNames=[
+                    ["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"],
+                    ["January","February","March","April","May","Juny","July","August","September","October","November","December"]
+                ];
+                let months=[
+                    31,
+                    ((date.getFullYear()%4==0 && date.getFullYear()%100!=0) || (date.getFullYear()%400==0 && date.getFullYear()%100==0)) ? 29 : 28,
+                    31, 30,31,30,31,31,30,31,30,31
+                ];
+                let cal_tables="";
+                if(document.getElementById('mday').checked==false){
+                    for (let i = 0; i < dayNames.length; i++) {
+                        let newDayNames=[dayNames[i][6]];
+                        for (let k = 0; k < dayNames[i].length-1; k++) {
+                            newDayNames.push(dayNames[i][k]);
+                        } dayNames[i]=newDayNames;
+                    }
+                }
+
+                for (let i = 0; i < monthNames[langIdx].length; i++) {
+                    date.setMonth(i); date.setDate(1);
+                    let startDay;
+                    if(document.getElementById('mday').checked){
+                        startDay=date.getDay()-1;
+                        if (startDay<0) startDay=6;
+                    } else startDay=date.getDay();
+                    
+                    cal_tables+="<table><tr><th colspan='7'>"+monthNames[langIdx][i]+"</th></tr><tr>";
+                    for (let k = 0; k < dayNames[langIdx].length; k++) {
+                        cal_tables+="<td class='dayLabel'>"+dayNames[langIdx][k]+"</td>";
+                        
+                    } cal_tables+="</tr><tr>";
+
+                    for (let k = 0; k < startDay; k++) {
+                        cal_tables+="<td></td>";
+                    }
+                    for (let k = 1; k <= months[i]; k++) {
+                        if(startDay==0 && k<months[i]) cal_tables+="<tr>";
+                        startDay+=1;
+                        cal_tables+="<td>"+k+"</td>";
+                        
+                        if(startDay>6) {
+                            startDay=0;
+                            cal_tables+="</tr>";
+                        }
+                    }
+                    for (let k = startDay; (startDay!=0) && (k < 7); k++) {
+                        cal_tables+="<td></td>";
+                        
+                        
+                    }cal_tables+="</tr>";
+                }
+                document.getElementById('calendar').innerHTML=cal_tables;
+                document.getElementById('y').innerHTML=date.getFullYear();
+            }
+            function displayToggle(){
+                if (dToggle){
+                    dToggle=false;
+                    document.getElementById('control').style.display="none";
+                } else{
+                    dToggle=true;
+                    document.getElementById('control').style.display="block";
+                }
+            }
+        </script>
+    </body>
+</html>
