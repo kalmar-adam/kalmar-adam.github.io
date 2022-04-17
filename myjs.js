@@ -2,7 +2,10 @@
 var projects=[
     ["Calendar Generator",
     "With this you can generate a simple calendar for personal use.",
-    "/calendargen/"]
+    "/calendargen/"],
+    ["Flask-Forum",
+    "A simple forum made with Python Flask and it uses SQLite3.",
+    "https://github.com/kalmar-adam/Flask-Forum"]
 ];
 var elements="";
 for (let i = 0; i < projects.length; i++) {
